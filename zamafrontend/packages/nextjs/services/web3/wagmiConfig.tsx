@@ -17,20 +17,26 @@ export const wagmiConfig = createConfig({
   connectors: wagmiConnectors(),
   ssr: true,
   client: ({ chain }) => {
+    const activeChain = chain ?? enabledChains[0];
+    if (!activeChain) {
+      throw new Error("No enabled chains configured for wagmi.");
+    }
+
     let rpcFallbacks = [http()];
-    const rpcOverrideUrl = (scaffoldConfig.rpcOverrides as ScaffoldConfig["rpcOverrides"])?.[chain.id];
+    const rpcOverrideUrl = (scaffoldConfig.rpcOverrides as ScaffoldConfig["rpcOverrides"])?.[activeChain.id];
     if (rpcOverrideUrl) {
       rpcFallbacks = [http(rpcOverrideUrl), http()];
     } else {
-      const alchemyHttpUrl = getAlchemyHttpUrl(chain.id);
+      const alchemyHttpUrl = getAlchemyHttpUrl(activeChain.id);
       if (alchemyHttpUrl) {
         rpcFallbacks = [http(alchemyHttpUrl), http()];
       }
     }
     return createClient({
-      chain,
+      chain: activeChain,
       transport: fallback(rpcFallbacks),
-      ...(chain.id !== (hardhat as Chain).id ? { pollingInterval: scaffoldConfig.pollingInterval } : {}),
+      ...(activeChain.id !== (hardhat as Chain).id ? { pollingInterval: scaffoldConfig.pollingInterval } : {}),
     });
   },
 });
+
