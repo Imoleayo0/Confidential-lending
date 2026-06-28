@@ -1,0 +1,176 @@
+﻿@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --shadow-center: 0 18px 50px -30px rgb(15 23 42 / 0.18);
+  --animate-pulse-fast: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@plugin "daisyui" {
+  themes: light;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+
+  --color-primary: #111111;
+  --color-primary-content: #ffffff;
+  --color-secondary: #f1e6d6;
+  --color-secondary-content: #111111;
+  --color-accent: #ffd208;
+  --color-accent-content: #111111;
+  --color-neutral: #111111;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #ffffff;
+  --color-base-200: #faf8f4;
+  --color-base-300: #f3efe8;
+  --color-base-content: #111111;
+  --color-info: #93bbfb;
+  --color-success: #34eeb6;
+  --color-warning: #ffcf72;
+  --color-error: #ff8863;
+
+  --radius-field: 9999rem;
+  --radius-box: 1rem;
+  --tt-tailw: 6px;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  body {
+    min-height: 100vh;
+    font-family:
+      "Telegraf",
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      Roboto,
+      Ubuntu,
+      Cantarell,
+      Noto Sans,
+      Helvetica Neue,
+      Arial,
+      "Apple Color Emoji",
+      "Segoe UI Emoji",
+      "Segoe UI Symbol";
+    background:
+      radial-gradient(circle at top left, rgba(17, 17, 17, 0.05), transparent 26%),
+      radial-gradient(circle at top right, rgba(17, 17, 17, 0.05), transparent 24%),
+      linear-gradient(180deg, #fdfbf7 0%, #faf7f1 100%);
+    color: #111111;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+}
+
+:root,
+[data-theme] {
+  background: #faf7f1;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  background:
+    linear-gradient(rgba(17, 17, 17, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.2;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.16), transparent 72%);
+}
+
+body::after {
+  background:
+    radial-gradient(circle at 18% 62%, rgba(17, 17, 17, 0.04), transparent 18%),
+    radial-gradient(circle at 82% 22%, rgba(17, 17, 17, 0.04), transparent 14%);
+}
+
+main,
+header,
+section,
+article {
+  position: relative;
+  z-index: 1;
+}
+
+.btn {
+  @apply shadow-md;
+}
+
+.btn.btn-ghost {
+  @apply shadow-none;
+}
+
+.link {
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  opacity: 80%;
+}
+
+.button-primary,
+.button-secondary,
+.button-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+.button-primary {
+  background: #ffd208;
+  color: #111111;
+  box-shadow: 0 18px 40px -24px rgba(255, 210, 8, 0.8);
+}
+
+.button-secondary {
+  background: #111111;
+  color: #ffffff;
+}
+
+.button-ghost {
+  background: #ffffff;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  color: #111111;
+}
+
+.button-primary:hover,
+.button-secondary:hover,
+.button-ghost:hover {
+  transform: translateY(-1px);
+  opacity: 0.98;
+}
