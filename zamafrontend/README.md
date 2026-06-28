@@ -60,6 +60,21 @@ pnpm deploy:sepolia
 pnpm start
 ```
 
+### Vercel
+
+Create a Vercel project from the GitHub repo and set:
+
+- **Root Directory**: `zamafrontend`
+- **Build Command**: `pnpm next:build`
+- **Install Command**: `corepack enable && pnpm install --no-frozen-lockfile`
+- **Node.js Version**: `20.x`
+
+Environment variables:
+
+- `NEXT_PUBLIC_ALCHEMY_API_KEY` — optional, but recommended for production RPC reliability
+- `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID` — optional, the app already has a default fallback
+
+The repo also includes `zamafrontend/vercel.json`, so the same commands are checked in with the app.
 ## Scripts
 
 | Command                  | What it does                                                                                 |
@@ -118,3 +133,7 @@ The per-contract `Name.ts` imports `Name.local.ts` and merges at module load, so
 ## License
 
 BSD-3-Clause-Clear. See [LICENSE](LICENSE).
+
+
+
+
