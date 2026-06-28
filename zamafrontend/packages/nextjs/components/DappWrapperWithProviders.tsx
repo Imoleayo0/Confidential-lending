@@ -17,13 +17,8 @@ import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 // is already in the alpha track (>= 3.0.0-alpha.16). See wagmiSigner.ts.
 import { WagmiSigner } from "~~/services/web3/wagmiSigner";
 
-// Module-scoped - the signer, keypair store and session store are chain-agnostic
-// and there is no reason to rebuild them on chain change. IndexedDBStorage lets
-// the keypair + EIP-712 session survive page reloads, matching Zama's hosted
-// app patterns.
+// Module-scoped - the signer is chain-agnostic and does not need to be rebuilt.
 const signer = new WagmiSigner({ config: wagmiConfig });
-const storage = new IndexedDBStorage("KeypairStore", 1);
-const sessionStorage = new IndexedDBStorage("SignatureStore", 1);
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,27 +29,48 @@ export const queryClient = new QueryClient({
 });
 
 // Swap RelayerCleartext for local anvil (31337), RelayerWeb for real networks.
-// Create the relayer only after mount so Next's server prerender never tries to
-// spin up browser-only workers.
+// Create the relayer and storage only after mount so Next's server prerender
+// never touches browser-only APIs.
 const ZamaRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
   const chainId = useChainId();
-  const [relayer, setRelayer] = useState<RelayerWeb | RelayerCleartext | null>(null);
+  const [runtime, setRuntime] = useState<{
+    relayer: RelayerWeb | RelayerCleartext;
+    storage: IndexedDBStorage;
+    sessionStorage: IndexedDBStorage;
+  } | null>(null);
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
 
   useEffect(() => {
-    const nextRelayer =
-      chainId === 31337
-        ? new RelayerCleartext(hardhatCleartextConfig)
-        : new RelayerWeb({
-            getChainId: () => signer.getChainId(),
-            transports: {
-              [SepoliaConfig.chainId]: SepoliaConfig,
-            },
-          });
+    let nextRelayer: RelayerWeb | RelayerCleartext | null = null;
 
-    setRelayer(nextRelayer);
+    try {
+      const nextStorage = new IndexedDBStorage("KeypairStore", 1);
+      const nextSessionStorage = new IndexedDBStorage("SignatureStore", 1);
+      nextRelayer =
+        chainId === 31337
+          ? new RelayerCleartext(hardhatCleartextConfig)
+          : new RelayerWeb({
+              getChainId: () => signer.getChainId(),
+              transports: {
+                [SepoliaConfig.chainId]: SepoliaConfig,
+              },
+            });
+
+      setRuntime({
+        relayer: nextRelayer,
+        storage: nextStorage,
+        sessionStorage: nextSessionStorage,
+      });
+      setRuntimeError(null);
+    } catch (error) {
+      setRuntime(null);
+      setRuntimeError(error instanceof Error ? error.message : "Failed to initialize Zama runtime.");
+      // eslint-disable-next-line no-console
+      console.error("Failed to initialize Zama runtime:", error);
+    }
 
     return () => {
-      nextRelayer.terminate();
+      nextRelayer?.terminate();
     };
   }, [chainId]);
 
@@ -62,16 +78,27 @@ const ZamaRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
     window.dispatchEvent(new CustomEvent(event.type, { detail: event }));
   }
 
-  if (!relayer) {
+  if (runtimeError) {
+    return (
+      <div className="min-h-screen bg-[#faf7f1] px-6 py-10 text-slate-900">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-black/10 bg-white p-6 shadow-sm">
+          <h1 className="text-2xl font-semibold">App failed to initialize</h1>
+          <p className="mt-2 text-sm text-slate-600">{runtimeError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!runtime) {
     return <div className="min-h-screen bg-[#faf7f1]" />;
   }
 
   return (
     <ZamaProvider
-      relayer={relayer}
+      relayer={runtime.relayer}
       signer={signer}
-      storage={storage}
-      sessionStorage={sessionStorage}
+      storage={runtime.storage}
+      sessionStorage={runtime.sessionStorage}
       onEvent={dispatchEvent}
     >
       {children}
