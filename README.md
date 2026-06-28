@@ -14,7 +14,7 @@ short the collateral asset, and trigger liquidation before you can react.
 
 ## The Solution
 
-ShieldLend encrypts collateral, debt, and health factor using Zama's Fully Homomorphic Encryption (FHE). Your position
+Zama Vault encrypts collateral, debt, and health factor using Zama's Fully Homomorphic Encryption (FHE). Your position
 is computed on-chain without ever being revealed.
 
 - Deposit encrypted collateral — nobody sees the amount
