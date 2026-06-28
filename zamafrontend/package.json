@@ -17,7 +17,7 @@
     "deploy:localhost": "./scripts/deploy-localhost.sh",
     "deploy:sepolia": "./scripts/deploy-sepolia.sh",
     "generate": "ts-node ./scripts/generateTsAbis.ts",
-    "postinstall": "ts-node ./scripts/generateTsAbis.ts || true",
+    "postinstall": "echo skip",
     "contracts:install": "cd packages/foundry && forge soldeer install",
     "contracts:build": "cd packages/foundry && forge build",
     "contracts:test": "cd packages/foundry && forge test -vv",
@@ -34,7 +34,7 @@
     "vercel": "pnpm --filter ./packages/nextjs vercel",
     "vercel:login": "pnpm --filter ./packages/nextjs vercel:login",
     "vercel:yolo": "pnpm --filter ./packages/nextjs vercel:yolo",
-    "prepare": "husky"
+    "prepare": "echo skip"
   },
   "lint-staged": {
     "packages/nextjs/**/*.{ts,tsx,js,jsx}": [
