@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ZamaProvider } from "@zama-fhe/react-sdk";
-import { IndexedDBStorage, RelayerWeb, SepoliaConfig, type ZamaSDKEvent } from "@zama-fhe/sdk";
-import { RelayerCleartext, hardhatCleartextConfig } from "@zama-fhe/sdk/cleartext";
+import * as ZamaSdk from "@zama-fhe/sdk";
+import type { ZamaSDKEvent } from "@zama-fhe/sdk";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
@@ -16,6 +16,8 @@ import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 // Swap to `@zama-fhe/react-sdk/wagmi` once a patched stable ships - the fix
 // is already in the alpha track (>= 3.0.0-alpha.16). See wagmiSigner.ts.
 import { WagmiSigner } from "~~/services/web3/wagmiSigner";
+
+const { IndexedDBStorage, RelayerWeb, SepoliaConfig, HardhatConfig } = ZamaSdk;
 
 // Module-scoped - the signer is chain-agnostic and does not need to be rebuilt.
 const signer = new WagmiSigner({ config: wagmiConfig });
@@ -34,21 +36,21 @@ export const queryClient = new QueryClient({
 const ZamaRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
   const chainId = useChainId();
   const [runtime, setRuntime] = useState<{
-    relayer: RelayerWeb | RelayerCleartext;
-    storage: IndexedDBStorage;
-    sessionStorage: IndexedDBStorage;
+    relayer: InstanceType<typeof RelayerWeb>;
+    storage: InstanceType<typeof IndexedDBStorage>;
+    sessionStorage: InstanceType<typeof IndexedDBStorage>;
   } | null>(null);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
 
   useEffect(() => {
-    let nextRelayer: RelayerWeb | RelayerCleartext | null = null;
+    let nextRelayer: InstanceType<typeof RelayerWeb> | null = null;
 
     try {
       const nextStorage = new IndexedDBStorage("KeypairStore", 1);
       const nextSessionStorage = new IndexedDBStorage("SignatureStore", 1);
       nextRelayer =
         chainId === 31337
-          ? new RelayerCleartext(hardhatCleartextConfig)
+          ? new ZamaSdk.RelayerWeb(HardhatConfig)
           : new RelayerWeb({
               getChainId: () => signer.getChainId(),
               transports: {
@@ -65,7 +67,6 @@ const ZamaRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       setRuntime(null);
       setRuntimeError(error instanceof Error ? error.message : "Failed to initialize Zama runtime.");
-      // eslint-disable-next-line no-console
       console.error("Failed to initialize Zama runtime:", error);
     }
 
