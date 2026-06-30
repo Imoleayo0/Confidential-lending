@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "start": "next start -p $PORT -H 0.0.0.0",
     "check-types": "tsc --noEmit --incremental",
     "dev": "next dev",
     "format": "prettier --write . '!(node_modules|.next|contracts)/**/*'",
     "lint": "next lint",
     "serve": "next start",
-    "start": "next dev",
     "vercel": "vercel --build-env YARN_ENABLE_IMMUTABLE_INSTALLS=false --build-env ENABLE_EXPERIMENTAL_COREPACK=1 --build-env VERCEL_TELEMETRY_DISABLED=1",
     "vercel:login": "vercel login",
     "vercel:yolo": "vercel --build-env YARN_ENABLE_IMMUTABLE_INSTALLS=false --build-env ENABLE_EXPERIMENTAL_COREPACK=1 --build-env NEXT_PUBLIC_IGNORE_BUILD_ERROR=true --build-env VERCEL_TELEMETRY_DISABLED=1"
@@ -34,6 +34,10 @@
     "wagmi": "^2.19.5",
     "zustand": "~5.0.0"
   },
+  "engines": {
+    "node": "20.x"
+  },
+  "packageManager": "pnpm@10.18.3",
   "devDependencies": {
     "@eslint/eslintrc": "~3.2.0",
     "@tailwindcss/postcss": "4.0.15",
