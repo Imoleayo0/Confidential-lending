@@ -13,8 +13,8 @@ export default function DepositPage() {
             Deposit collateral.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-500 lg:text-lg">
-            Enter an amount, encrypt it in the browser, and send it to EVA without exposing the number to the
-            chain, bots, or explorers.
+            Enter an amount, encrypt it in the browser, and send it to EVA without exposing the number to the chain,
+            bots, or explorers.
           </p>
         </div>
 
@@ -63,4 +63,3 @@ export default function DepositPage() {
     </main>
   );
 }
-

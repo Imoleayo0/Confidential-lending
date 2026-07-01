@@ -1,11 +1,8 @@
 ﻿"use client";
 
 import { useMemo, useState } from "react";
-import { createInstance, SepoliaConfigV2 } from "@zama-fhe/relayer-sdk/web";
 import { COLLATERAL_VAULT_ABI, COLLATERAL_VAULT_ADDRESS } from "../config/contracts";
-import { wagmiConfig } from "../services/web3/wagmiConfig";
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { simulateContract } from "wagmi/actions";
 
 const inputClassName =
   "h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-[1rem] text-slate-950 outline-none transition focus:border-[#ffd208] focus:ring-4 focus:ring-[#ffd208]/20";
@@ -20,8 +17,6 @@ export function PositionDashboard() {
   const { address, isConnected } = useAccount();
   const [newPrice, setNewPrice] = useState("");
   const [error, setError] = useState("");
-  const [liquidationStatus, setLiquidationStatus] = useState<"liquidatable" | "safe" | null>(null);
-  const [isCheckingLiquidation, setIsCheckingLiquidation] = useState(false);
 
   const ownerQuery = useReadContract({
     abi: COLLATERAL_VAULT_ABI,
@@ -45,6 +40,9 @@ export function PositionDashboard() {
     hash: priceTxHash,
   });
 
+  const { writeContract: writeLiquidate, data: liqTxHash, isPending: isLiqPending } = useWriteContract();
+  const { isLoading: isLiqConfirming, isSuccess: isLiqSuccess } = useWaitForTransactionReceipt({ hash: liqTxHash });
+
   const { writeContract: writeWithdraw, data: withdrawTxHash, isPending: isWithdrawPending } = useWriteContract();
   const { isLoading: isWithdrawConfirming, isSuccess: isWithdrawSuccess } = useWaitForTransactionReceipt({
     hash: withdrawTxHash,
@@ -61,40 +59,16 @@ export function PositionDashboard() {
     });
   }
 
-  async function handleCheckLiquidatable() {
+  function handleCheckLiquidatable() {
     if (!address) return;
     setError("");
-    setLiquidationStatus(null);
-    setIsCheckingLiquidation(true);
-
-    try {
-      const { result: encryptedResult } = await simulateContract(wagmiConfig, {
-        abi: COLLATERAL_VAULT_ABI,
-        address: COLLATERAL_VAULT_ADDRESS,
-        functionName: "checkLiquidatable",
-        args: [address],
-        account: address,
-      });
-
-      const ethereum = typeof window !== "undefined" ? (window as Window & { ethereum?: unknown }).ethereum : undefined;
-      if (!ethereum) {
-        throw new Error("Connect a wallet to decrypt the result");
-      }
-
-      const fhevm = await createInstance({
-        ...SepoliaConfigV2,
-        network: ethereum as Parameters<typeof createInstance>[0]["network"],
-      });
-
-      const result = await fhevm.publicDecrypt([encryptedResult as `0x${string}`]);
-      const clearValues = result.clearValues as Record<string, boolean | bigint | string>;
-      const decrypted = clearValues[String(encryptedResult)];
-      setLiquidationStatus(Boolean(decrypted) ? "liquidatable" : "safe");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Liquidation check failed");
-    } finally {
-      setIsCheckingLiquidation(false);
-    }
+    writeLiquidate({
+      abi: COLLATERAL_VAULT_ABI,
+      address: COLLATERAL_VAULT_ADDRESS,
+      functionName: "checkLiquidatable",
+      args: [address],
+      gas: 15_000_000n,
+    });
   }
 
   function handleEmergencyWithdraw() {
@@ -201,21 +175,19 @@ export function PositionDashboard() {
             <h3 className="m-0 text-base font-semibold tracking-[-0.03em] text-slate-950">Liquidation check</h3>
           </div>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            Checks the encrypted position, decrypts the boolean, and shows the result on screen.
+            Checks the encrypted position and returns only a boolean.
           </p>
           <div className="mt-4 grid gap-3">
-            <button onClick={handleCheckLiquidatable} disabled={isCheckingLiquidation} className={buttonClassName}>
-              {isCheckingLiquidation ? "Checking..." : "Check liquidatable"}
+            <button
+              onClick={handleCheckLiquidatable}
+              disabled={isLiqPending || isLiqConfirming}
+              className={buttonClassName}
+            >
+              {isLiqPending || isLiqConfirming ? "Checking..." : "Check liquidatable"}
             </button>
-            {liquidationStatus ? (
-              <div
-                className={`rounded-2xl px-4 py-3 text-sm ${
-                  liquidationStatus === "liquidatable"
-                    ? "border border-amber-500/15 bg-amber-500/8 text-amber-800"
-                    : "border border-emerald-500/15 bg-emerald-500/8 text-emerald-700"
-                }`}
-              >
-                {liquidationStatus === "liquidatable" ? "Position is liquidatable." : "Position is safe."}
+            {isLiqSuccess ? (
+              <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/8 px-4 py-3 text-sm text-emerald-700">
+                Check submitted.
               </div>
             ) : null}
             {error ? (
@@ -260,6 +232,3 @@ export function PositionDashboard() {
     </article>
   );
 }
-
-
-

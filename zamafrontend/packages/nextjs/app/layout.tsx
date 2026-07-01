@@ -25,4 +25,3 @@ const DappWrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default DappWrapper;
-

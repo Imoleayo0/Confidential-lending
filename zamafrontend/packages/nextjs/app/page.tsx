@@ -18,8 +18,8 @@ export default function Home() {
             <span className="block text-[#d97706]">Hide the amounts.</span>
           </h1>
           <p className="mx-auto max-w-2xl text-[0.98rem] leading-8 text-slate-500 sm:text-[1.08rem]">
-            EVA keeps deposits, borrows, and liquidation checks encrypted on-chain. Everyone can verify the
-            protocol works, but only the right wallet can decrypt the values.
+            EVA keeps deposits, borrows, and liquidation checks encrypted on-chain. Everyone can verify the protocol
+            works, but only the right wallet can decrypt the values.
           </p>
         </div>
 
@@ -44,4 +44,3 @@ export default function Home() {
     </main>
   );
 }
-
