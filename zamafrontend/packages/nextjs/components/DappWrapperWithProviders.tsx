@@ -10,6 +10,7 @@ import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { WagmiProvider } from "wagmi";
+import { getBlock, getChainId, readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { Header } from "~~/components/Header";
 import { BlockieAvatar } from "~~/components/helper";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
@@ -23,16 +24,23 @@ const zamaConfig = createConfig({
     [zamaSepolia.id]: web(),
   },
   signer,
-  storage: new IndexedDBStorage("KeypairStore", 1),
-  permitStorage: new IndexedDBStorage("SignatureStore", 1),
-});
-
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
+  provider: {
+    async getChainId() {
+      return getChainId(wagmiConfig);
+    },
+    async readContract(config: any) {
+      return readContract(wagmiConfig, config);
+    },
+    async waitForTransactionReceipt(hash: any) {
+      return (await waitForTransactionReceipt(wagmiConfig, { hash })) as any;
+    },
+    async getBlockTimestamp() {
+      const block = await getBlock(wagmiConfig);
+      return block.timestamp;
     },
   },
+  storage: new IndexedDBStorage("KeypairStore", 1),
+  permitStorage: new IndexedDBStorage("SignatureStore", 1),
 });
 
 export const DappWrapperWithProviders = ({ children }: { children: React.ReactNode }) => {
