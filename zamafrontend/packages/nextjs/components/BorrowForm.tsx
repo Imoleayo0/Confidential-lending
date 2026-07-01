@@ -1,15 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { COLLATERAL_VAULT_ABI, COLLATERAL_VAULT_ADDRESS } from "../config/contracts";
 import { useEncrypt } from "@zama-fhe/react-sdk";
-import { bytesToHex } from "viem";
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-
-type EncryptResponse = {
-  handles: Uint8Array[];
-  inputProof: Uint8Array;
-};
 
 const inputClassName =
   "h-12 w-full rounded-2xl border border-black/10 bg-white px-4 text-[1rem] text-slate-950 outline-none transition focus:border-[#ffd208] focus:ring-4 focus:ring-[#ffd208]/20";
@@ -46,13 +40,13 @@ export function BorrowForm() {
 
     try {
       const value = parsePositiveWholeNumber(amount);
-      const enc = (await encrypt.mutateAsync({
+      const enc = await encrypt.mutateAsync({
         values: [{ value, type: "euint64" }],
         contractAddress: COLLATERAL_VAULT_ADDRESS,
         userAddress: address,
-      })) as EncryptResponse;
+      });
 
-      const [handle] = enc.handles;
+      const [handle] = enc.encryptedValues;
       if (!handle) {
         throw new Error("Encryption returned no handles");
       }
@@ -61,7 +55,7 @@ export function BorrowForm() {
         abi: COLLATERAL_VAULT_ABI,
         address: COLLATERAL_VAULT_ADDRESS,
         functionName: "borrowAgainst",
-        args: [bytesToHex(handle), bytesToHex(enc.inputProof)],
+        args: [handle, enc.inputProof],
         gas: 15_000_000n,
       });
     } catch (e) {

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { COLLATERAL_VAULT_ABI, COLLATERAL_VAULT_ADDRESS } from "../config/contracts";
 import { useEncrypt } from "@zama-fhe/react-sdk";
-import { bytesToHex } from "viem";
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 const inputClassName =
@@ -51,7 +50,7 @@ export function DepositForm() {
         abi: COLLATERAL_VAULT_ABI,
         address: COLLATERAL_VAULT_ADDRESS,
         functionName: "depositCollateral",
-        args: [bytesToHex(enc.handles[0]!), bytesToHex(enc.inputProof)],
+        args: [enc.encryptedValues[0]!, enc.inputProof],
         gas: 15_000_000n,
       });
     } catch (e) {
