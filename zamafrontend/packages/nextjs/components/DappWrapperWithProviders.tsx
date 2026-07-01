@@ -43,6 +43,14 @@ const zamaConfig = createConfig({
   permitStorage: new IndexedDBStorage("SignatureStore", 1),
 });
 
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 export const DappWrapperWithProviders = ({ children }: { children: React.ReactNode }) => {
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
