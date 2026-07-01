@@ -13,7 +13,7 @@ export default function DepositPage() {
             Deposit collateral.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-500 lg:text-lg">
-            Enter an amount, encrypt it in the browser, and send it to the vault without exposing the number to the
+            Enter an amount, encrypt it in the browser, and send it to EVA without exposing the number to the
             chain, bots, or explorers.
           </p>
         </div>
@@ -28,7 +28,7 @@ export default function DepositPage() {
               </span>
               <h2 className="text-2xl font-semibold tracking-[-0.04em] text-slate-950">Browser-side encryption</h2>
               <p className="text-sm leading-7 text-slate-500">
-                The amount is encrypted before the transaction is created, so the vault only receives ciphertext.
+                The amount is encrypted before the transaction is created, so EVA only receives ciphertext.
               </p>
             </div>
 
@@ -63,3 +63,4 @@ export default function DepositPage() {
     </main>
   );
 }
+

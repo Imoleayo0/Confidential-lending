@@ -67,7 +67,7 @@ export function DepositForm() {
         </div>
         <h2 className="mb-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950">Deposit collateral</h2>
         <p className="m-0 text-sm leading-7 text-slate-500">
-          Connect your wallet to encrypt a collateral amount in the browser and send it to the vault.
+          Connect your wallet to encrypt a collateral amount in the browser and send it to EVA.
         </p>
       </article>
     );
@@ -86,7 +86,7 @@ export function DepositForm() {
 
       <h2 className="mb-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950">Deposit collateral</h2>
       <p className="m-0 text-sm leading-7 text-slate-500">
-        The amount is encrypted before it leaves your browser, then written to the vault as an encrypted handle.
+        The amount is encrypted before it leaves your browser, then written to EVA as an encrypted handle.
       </p>
 
       <div className="mt-6 grid gap-4">
@@ -130,3 +130,4 @@ export function DepositForm() {
     </article>
   );
 }
+

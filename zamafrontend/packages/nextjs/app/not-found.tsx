@@ -9,7 +9,7 @@ export default function NotFound() {
         </div>
         <h1 className="text-5xl font-semibold tracking-[-0.06em] text-slate-950">404</h1>
         <p className="mt-3 text-sm leading-7 text-slate-500">
-          The page you are looking for does not exist. Head back to the landing page or open the vault screens.
+          The page you are looking for does not exist. Head back to the landing page or open EVA screens.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link href="/" className="button-primary">
@@ -23,3 +23,4 @@ export default function NotFound() {
     </main>
   );
 }
+

@@ -1,4 +1,4 @@
-# Zama vault — Confidential Lending on Zama fhEVM
+# EVA — Confidential Lending on Zama fhEVM
 
 > Borrow against hidden collateral. Bots can't hunt what they can't see.
 
@@ -14,8 +14,8 @@ short the collateral asset, and trigger liquidation before you can react.
 
 ## The Solution
 
-Zama Vault encrypts collateral, debt, and health factor using Zama's Fully Homomorphic Encryption (FHE). Your position
-is computed on-chain without ever being revealed.
+EVA encrypts collateral, debt, and health factor using Zama's Fully Homomorphic Encryption (FHE). Your position is
+computed on-chain without ever being revealed.
 
 - Deposit encrypted collateral — nobody sees the amount
 - Borrow against it — debt stays private
@@ -146,8 +146,8 @@ follows the same `FHE.fromExternal` pattern as deposit and is the natural next s
 FHE division is expensive. A naive health factor implementation requires `(collateral × price) / debt` — dividing two
 encrypted values is complex and gas-intensive in fhEVM today.
 
-ShieldLend avoids this entirely by reformulating: instead of computing `HF < 1.0`, we check `collateral × price < debt`
-using `FHE.lt(FHE.mul(collateral, price), debt)`. Same result, no division, works within current fhEVM constraints.
+EVA avoids this entirely by reformulating: instead of computing `HF < 1.0`, we check `collateral × price < debt` using
+`FHE.lt(FHE.mul(collateral, price), debt)`. Same result, no division, works within current fhEVM constraints.
 
 ## Future Work
 

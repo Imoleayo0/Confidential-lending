@@ -18,10 +18,10 @@ export const Header = () => {
       <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 rounded-[24px] border border-black/10 bg-[#efe5d8] px-4 py-3 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] backdrop-blur md:flex-row md:items-center md:justify-between">
         <Link href="/" className="flex items-center gap-3 text-black no-underline">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-slate-950 text-sm font-semibold text-white shadow-lg shadow-slate-950/20">
-            Z
+            E
           </span>
           <span className="flex flex-col leading-none">
-            <strong className="text-[0.98rem] font-semibold tracking-[-0.03em]">Zama Vault</strong>
+            <strong className="text-[0.98rem] font-semibold tracking-[-0.03em]">EVA</strong>
             <span className="text-xs text-slate-600">Confidential lending</span>
           </span>
         </Link>
@@ -58,3 +58,5 @@ export const Header = () => {
     </header>
   );
 };
+
+

@@ -18,7 +18,7 @@ export default function Home() {
             <span className="block text-[#d97706]">Hide the amounts.</span>
           </h1>
           <p className="mx-auto max-w-2xl text-[0.98rem] leading-8 text-slate-500 sm:text-[1.08rem]">
-            Zama Vault keeps deposits, borrows, and liquidation checks encrypted on-chain. Everyone can verify the
+            EVA keeps deposits, borrows, and liquidation checks encrypted on-chain. Everyone can verify the
             protocol works, but only the right wallet can decrypt the values.
           </p>
         </div>
@@ -38,9 +38,10 @@ export default function Home() {
           <span className="font-semibold text-slate-950">Verified</span>
           <span>Liquidation checks remain on-chain.</span>
           <span className="font-semibold text-slate-950">Connected</span>
-          <span>Frontend talks directly to the vault.</span>
+          <span>Frontend talks directly to EVA.</span>
         </div>
       </section>
     </main>
   );
 }
+

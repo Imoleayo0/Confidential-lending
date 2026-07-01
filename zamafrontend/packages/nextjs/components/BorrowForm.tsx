@@ -72,7 +72,7 @@ export function BorrowForm() {
         </div>
         <h2 className="mb-2 text-2xl font-semibold tracking-[-0.04em] text-slate-950">Borrow against collateral</h2>
         <p className="m-0 text-sm leading-7 text-slate-500">
-          Connect your wallet to encrypt a borrow amount and submit it to the vault.
+          Connect your wallet to encrypt a borrow amount and submit it to EVA.
         </p>
       </article>
     );
@@ -135,3 +135,4 @@ export function BorrowForm() {
     </article>
   );
 }
+

@@ -13,7 +13,7 @@ export default function BorrowPage() {
             Borrow against collateral.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-500 lg:text-lg">
-            Borrowing uses the same encrypted flow. The vault records debt without turning the position into public
+            Borrowing uses the same encrypted flow. EVA records debt without turning the position into public
             data.
           </p>
         </div>
@@ -28,7 +28,7 @@ export default function BorrowPage() {
               </span>
               <h2 className="text-2xl font-semibold tracking-[-0.04em] text-slate-950">Encrypted debt flow</h2>
               <p className="text-sm leading-7 text-slate-500">
-                The vault only sees the encrypted amount and the proof. The user can decrypt their own balance later.
+                EVA only sees the encrypted amount and the proof. The user can decrypt their own balance later.
               </p>
             </div>
 
@@ -62,3 +62,4 @@ export default function BorrowPage() {
     </main>
   );
 }
+
