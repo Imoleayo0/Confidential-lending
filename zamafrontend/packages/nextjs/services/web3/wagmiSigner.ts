@@ -84,7 +84,7 @@ export class WagmiSigner implements GenericSigner {
     const sigTypes = { ...typedData.types };
     delete (sigTypes as Record<string, unknown>).EIP712Domain;
     return signTypedData(this.config, {
-      primaryType: Object.keys(sigTypes)[0]!,
+      primaryType: Object.keys(sigTypes)[0]! as any,
       types: sigTypes,
       domain: typedData.domain as any,
       message: typedData.message as any,
