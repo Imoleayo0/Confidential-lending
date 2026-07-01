@@ -175,7 +175,7 @@ export function PositionDashboard() {
             <h3 className="m-0 text-base font-semibold tracking-[-0.03em] text-slate-950">Liquidation check</h3>
           </div>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            Checks the encrypted position and returns only a boolean.
+            Runs the encrypted liquidation check and submits the result.
           </p>
           <div className="mt-4 grid gap-3">
             <button
@@ -187,7 +187,7 @@ export function PositionDashboard() {
             </button>
             {isLiqSuccess ? (
               <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/8 px-4 py-3 text-sm text-emerald-700">
-                Check submitted.
+                Liquidation check submitted.
               </div>
             ) : null}
             {error ? (
