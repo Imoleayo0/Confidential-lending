@@ -51,7 +51,6 @@ export function DepositForm() {
         address: COLLATERAL_VAULT_ADDRESS,
         functionName: "depositCollateral",
         args: [enc.encryptedValues[0]!, enc.inputProof],
-        gas: 15_000_000n,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Encryption failed");
