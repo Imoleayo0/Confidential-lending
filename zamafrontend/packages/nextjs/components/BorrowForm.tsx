@@ -54,9 +54,8 @@ export function BorrowForm() {
       writeContract({
         abi: COLLATERAL_VAULT_ABI,
         address: COLLATERAL_VAULT_ADDRESS,
-        functionName: "borrowAgainst",
-        args: [handle, enc.inputProof],
-        gas: 15_000_000n,
+        functionName: "depositCollateral",
+        args: [bytesToHex(enc.handles[0]!), bytesToHex(enc.inputProof)],
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Encryption failed");
