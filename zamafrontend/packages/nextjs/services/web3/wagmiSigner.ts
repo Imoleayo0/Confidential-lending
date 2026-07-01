@@ -1,8 +1,16 @@
-import type { EIP712TypedData, GenericSigner, Hex, SignerLifecycleCallbacks, TransactionReceipt } from "@zama-fhe/sdk";
+import type {
+  EIP712TypedData,
+  GenericSigner,
+  Hex,
+  TransactionReceipt,
+  WalletAccount,
+  WalletAccountListener,
+  WalletAccountStore,
+} from "@zama-fhe/sdk";
+import { WalletNotConnectedError } from "@zama-fhe/sdk";
 import type { Config } from "wagmi";
 import {
   getAccount,
-  getBlock,
   getChainId,
   readContract,
   signTypedData,
@@ -11,39 +19,68 @@ import {
   writeContract,
 } from "wagmi/actions";
 
-/**
- * Wagmi-backed GenericSigner.
- *
- * Reimplements `@zama-fhe/react-sdk/wagmi`'s WagmiSigner locally because
- * @zama-fhe/react-sdk@3.0.0 (stable) imports `watchConnection` from
- * `wagmi/actions`, and wagmi only exports `watchAccount`. The upstream fix
- * is already in the alpha track (≥ 3.0.0-alpha.16 uses `watchAccount`);
- * delete this file and switch `DappWrapperWithProviders` back to
- * `import { WagmiSigner } from "@zama-fhe/react-sdk/wagmi"` once the fix
- * reaches a stable release.
- */
+class WagmiWalletAccountStore implements WalletAccountStore {
+  private config: Config;
+  private listeners: Set<WalletAccountListener> = new Set();
+  private current: WalletAccount | undefined;
+  private ready = false;
+
+  constructor(config: Config) {
+    this.config = config;
+    const account = getAccount(config);
+    if (account.address && account.chainId) {
+      this.current = { address: account.address, chainId: account.chainId };
+      this.ready = true;
+    }
+
+    watchAccount(config, {
+      onChange: account => {
+        const next =
+          account.address && account.chainId ? { address: account.address, chainId: account.chainId } : undefined;
+        const previous = this.current;
+        this.current = next;
+        this.ready = true;
+        this.listeners.forEach(l => l({ previous, next }));
+      },
+    });
+  }
+
+  getSnapshot(): WalletAccount | undefined {
+    return this.current;
+  }
+
+  isReady(): boolean {
+    return this.ready;
+  }
+
+  subscribe(onWalletAccountChange: WalletAccountListener): () => void {
+    // Emit current state synchronously if already known (SDK requires this)
+    if (this.current) {
+      onWalletAccountChange({ previous: undefined, next: this.current });
+    }
+    this.listeners.add(onWalletAccountChange);
+    return () => this.listeners.delete(onWalletAccountChange);
+  }
+}
+
 export class WagmiSigner implements GenericSigner {
+  readonly walletAccount: WalletAccountStore;
   private config: Config;
 
   constructor(signerConfig: { config: Config }) {
     this.config = signerConfig.config;
+    this.walletAccount = new WagmiWalletAccountStore(signerConfig.config);
   }
 
-  async getChainId(): Promise<number> {
-    return getChainId(this.config);
-  }
-
-  async getAddress(): Promise<`0x${string}`> {
-    const account = getAccount(this.config);
-    if (!account?.address) {
-      throw new TypeError("Invalid address");
+  requireWalletAccount(operation: string): WalletAccount {
+    const account = this.walletAccount.getSnapshot();
+    if (!account) {
+      throw new WalletNotConnectedError(operation);
     }
-    return account.address;
+    return account;
   }
 
   async signTypedData(typedData: EIP712TypedData): Promise<Hex> {
-    // wagmi's signTypedData derives EIP712Domain from `domain`; passing it via
-    // `types` triggers "Ambiguous primary type" — strip it here.
     const sigTypes = { ...typedData.types };
     delete (sigTypes as Record<string, unknown>).EIP712Domain;
     return signTypedData(this.config, {
@@ -66,24 +103,7 @@ export class WagmiSigner implements GenericSigner {
     return (await waitForTransactionReceipt(this.config, { hash })) as unknown as TransactionReceipt;
   }
 
-  async getBlockTimestamp(): Promise<bigint> {
-    const block = await getBlock(this.config);
-    return block.timestamp;
-  }
-
-  subscribe({ onDisconnect, onAccountChange, onChainChange }: SignerLifecycleCallbacks): () => void {
-    return watchAccount(this.config, {
-      onChange: (account, prevAccount) => {
-        if (account.status === "disconnected" && prevAccount.status !== "disconnected") {
-          onDisconnect?.();
-        }
-        if (account.address && prevAccount.address && account.address !== prevAccount.address) {
-          onAccountChange?.(account.address);
-        }
-        if (account.chainId && account.chainId !== prevAccount.chainId) {
-          onChainChange?.(account.chainId);
-        }
-      },
-    });
+  async getChainId(): Promise<number> {
+    return getChainId(this.config);
   }
 }
