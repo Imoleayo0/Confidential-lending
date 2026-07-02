@@ -67,7 +67,6 @@ export function PositionDashboard() {
       address: COLLATERAL_VAULT_ADDRESS,
       functionName: "checkLiquidatable",
       args: [address],
-      gas: 15_000_000n,
     });
   }
 
@@ -183,7 +182,7 @@ export function PositionDashboard() {
               disabled={isLiqPending || isLiqConfirming}
               className={buttonClassName}
             >
-              {isLiqPending || isLiqConfirming ? "Checking..." : "Check liquidatable"}
+              {isLiqPending || isLiqConfirming ? "Checking..." : "Run liquidation check"}
             </button>
             {isLiqSuccess ? (
               <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/8 px-4 py-3 text-sm text-emerald-700">
